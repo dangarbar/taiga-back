@@ -27,6 +27,7 @@ import webcolors
 
 from django.template.defaultfilters import slugify
 from taiga.base import exceptions as exc
+from taiga.projects.custom_attributes.choices import DROPDOWN_TYPE
 from taiga.projects.services import projects as projects_service
 from taiga.projects.models import Project, ProjectTemplate
 from taiga.projects.userstories.models import UserStory
@@ -157,9 +158,11 @@ class TrelloImporter:
             "/board/{}".format(project_id),
             {
                 "fields": "name,desc",
+                "customFields": "true",
                 "cards": "all",
                 "card_fields": "closed,labels,idList,desc,due,name,pos,dateLastActivity,idChecklists,idMembers,url",
                 "card_attachments": "true",
+                "card_customFieldItems": "true",
                 "labels": "all",
                 "labels_limit": "1000",
                 "lists": "all",
@@ -262,7 +265,38 @@ class TrelloImporter:
             project=project
         )
         import_service.create_memberships(options.get('users_bindings', {}), project, self._user, "trello")
+        self._import_custom_fields(data, project)
         return project
+
+    def _import_custom_fields(self, data, project):
+        custom_field_types_mapping = {
+            'list': DROPDOWN_TYPE
+        }
+        for custom_field in data['customFields']:
+            custom_field_source_type = custom_field.get('type')
+            if not custom_field_source_type:
+                continue
+
+            custom_field_target_type = custom_field_types_mapping.get(custom_field_source_type)
+            if not custom_field_target_type:
+                continue
+
+            custom_field_extra_info = None
+            custom_field_extra_importer = '_import_%s_extra' % custom_field_target_type
+            if hasattr(self, custom_field_extra_importer):
+                import_method = getattr(self, custom_field_extra_importer)
+                custom_field_extra_info = import_method(custom_field)
+
+            UserStoryCustomAttribute.objects.create(
+                name=custom_field.get('name'),
+                type=custom_field_target_type,
+                extra=custom_field_extra_info,
+                project=project
+            )
+
+    def _import_dropdown_extra(self, custom_field):
+        return [option['value']['text'] for option in custom_field['options']
+                if option.get('value')]
 
     def _import_user_stories_data(self, data, project, options):
         users_bindings = options.get('users_bindings', {})
