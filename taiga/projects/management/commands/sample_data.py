@@ -44,7 +44,13 @@ from taiga.projects.issues.models import *
 from taiga.projects.wiki.models import *
 from taiga.projects.attachments.models import *
 from taiga.projects.custom_attributes.models import *
-from taiga.projects.custom_attributes.choices import TYPES_CHOICES, TEXT_TYPE, MULTILINE_TYPE, DATE_TYPE, URL_TYPE
+from taiga.projects.custom_attributes.choices import TYPES_CHOICES
+from taiga.projects.custom_attributes.choices import TEXT_TYPE
+from taiga.projects.custom_attributes.choices import MULTILINE_TYPE
+from taiga.projects.custom_attributes.choices import DATE_TYPE
+from taiga.projects.custom_attributes.choices import URL_TYPE
+from taiga.projects.custom_attributes.choices import DROPDOWN_TYPE
+
 from taiga.projects.history.services import take_snapshot
 from taiga.projects.likes.services import add_like
 from taiga.projects.votes.services import add_vote
