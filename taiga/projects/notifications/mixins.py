@@ -407,16 +407,15 @@ class AssignedToSignalMixin:
 class AssignedUsersSignalMixin:
     _old_assigned_users = None
 
-    def update(self, request, *args, **kwargs):
-        obj = self.get_object_or_none()
-        if hasattr(obj, "assigned_users") and obj.id:
+    def pre_save(self, obj):
+        if obj.id and hasattr(obj, "assigned_users"):
             self._old_assigned_users = [
                 user for user in obj.assigned_users.all()
             ].copy()
+        super().pre_save(obj)
 
-        result = super().update(request, *args, **kwargs)
-
-        if result and obj.assigned_users:
+    def post_save(self, obj, created=False):
+        if obj.id and hasattr(obj, "assigned_users"):
             new_assigned_users = [
                 user for user in obj.assigned_users.all()
                 if user not in self._old_assigned_users
@@ -427,5 +426,4 @@ class AssignedUsersSignalMixin:
                                        user=self.request.user,
                                        obj=obj,
                                        new_assigned_users=new_assigned_users)
-
-        return result
+        super().post_save(obj, created)

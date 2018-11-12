@@ -1310,21 +1310,21 @@ def test_us_updated_generates_web_notifications(client):
     notification_data = _notification_data(project, member1.user, us,
                                            'userstory')
 
-    # Notification added_as_watcher
-    assert notifications[0].user == member3.user
-    assert notifications[0].event_type == WebNotificationType.added_as_watcher
+    # Notification assigned_users
+    assert notifications[0].user == member2.user
+    assert notifications[0].event_type == WebNotificationType.assigned.value
     assert notifications[0].read is None
     assert notifications[0].data == notification_data
 
-    # Notification mentioned
-    assert notifications[1].user == member4.user
-    assert notifications[1].event_type == WebNotificationType.mentioned
+    # Notification added_as_watcher
+    assert notifications[1].user == member3.user
+    assert notifications[1].event_type == WebNotificationType.added_as_watcher
     assert notifications[1].read is None
     assert notifications[1].data == notification_data
 
-    # Notification assigned_users
-    assert notifications[2].user == member2.user
-    assert notifications[2].event_type == WebNotificationType.assigned.value
+    # Notification mentioned
+    assert notifications[2].user == member4.user
+    assert notifications[2].event_type == WebNotificationType.mentioned
     assert notifications[2].read is None
     assert notifications[2].data == notification_data
 
