@@ -60,6 +60,7 @@ class UserStoryListSerializer(ProjectExtraInfoSerializerMixin,
     project = Field(attr="project_id")
     is_closed = Field()
     points = MethodField()
+    game_points = MethodField()
     backlog_order = Field()
     sprint_order = Field()
     kanban_order = Field()
@@ -135,6 +136,12 @@ class UserStoryListSerializer(ProjectExtraInfoSerializerMixin,
             return {}
 
         return obj.role_points_attr
+
+    def get_game_points(self, obj):
+        if obj.game_points_attr is None:
+            return None
+
+        return obj.game_points_attr
 
     def get_comment(self, obj):
         return ""

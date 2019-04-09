@@ -69,6 +69,30 @@ def attach_role_points(queryset, as_field="role_points_attr"):
     return queryset
 
 
+def attach_game_points(queryset, as_field="game_points_attr"):
+    """Attach role point as json column to each object of the queryset.
+
+    :param queryset: A Django user stories queryset object.
+    :param as_field: Attach the role points as an attribute with this name.
+
+    :return: Queryset object with the additional `as_field` field.
+    """
+    model = queryset.model
+    sql = """
+    SELECT obj.value->>'name'
+    FROM projects_game
+    JOIN LATERAL jsonb_array_elements(projects_game.userstories) us(value)
+        ON us.value->>'id' = text({tbl}.id)
+    JOIN LATERAL jsonb_array_elements(projects_game.scales) obj(value)
+        ON obj.value->>'id' = us.value->>'scale_id'
+    ORDER BY projects_game.id DESC LIMIT 1
+    """
+    sql = sql.format(tbl=model._meta.db_table)
+    queryset = queryset.extra(select={as_field: sql})
+
+    return queryset
+
+
 def attach_tasks(queryset, as_field="tasks_attr"):
     """Attach tasks as json column to each object of the queryset.
 
@@ -157,6 +181,7 @@ def attach_epic_order(queryset, epic_id, as_field="epic_order"):
 def attach_extra_info(queryset, user=None, include_attachments=False, include_tasks=False, epic_id=None):
     queryset = attach_total_points(queryset)
     queryset = attach_role_points(queryset)
+    queryset = attach_game_points(queryset)
     queryset = attach_epics(queryset)
 
     if include_attachments:
