@@ -290,12 +290,6 @@ class ProjectTemplateAdmin(admin.ModelAdmin):
     pass
 
 
-class GameAdmin(admin.ModelAdmin):
-    list_display = ["project", "name", "uuid"]
-    list_display_links = ["name"]
-    raw_id_fields = ["project"]
-
-
 admin.site.register(models.IssueStatus, IssueStatusAdmin)
 admin.site.register(models.TaskStatus, TaskStatusAdmin)
 admin.site.register(models.UserStoryStatus, UserStoryStatusAdmin)
@@ -306,4 +300,3 @@ admin.site.register(models.Severity, SeverityAdmin)
 admin.site.register(models.Priority, PriorityAdmin)
 admin.site.register(models.IssueType, IssueTypeAdmin)
 admin.site.register(models.ProjectTemplate, ProjectTemplateAdmin)
-admin.site.register(models.Game, GameAdmin)

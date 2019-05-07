@@ -329,6 +329,8 @@ INSTALLED_APPS = [
     "sr",
     "easy_thumbnails",
     "raven.contrib.django.raven_compat",
+
+    "taiga_seedtime",
 ]
 
 WSGI_APPLICATION = "taiga.wsgi.application"
@@ -590,6 +592,8 @@ IMPORTERS = {
         "app_secret": "",
     }
 }
+
+SEEDTIME_ENABLED = False
 
 # NOTE: DON'T INSERT MORE SETTINGS AFTER THIS LINE
 TEST_RUNNER="django.test.runner.DiscoverRunner"
