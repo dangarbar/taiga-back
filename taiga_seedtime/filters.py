@@ -13,15 +13,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from taiga.base.filters import FilterBackend
 
-from taiga.base import routers
-
-from taiga_seedtime.api import GameViewSet, GameUsViewSet
+from . import models
 
 
-router = routers.DefaultRouter(trailing_slash=False)
+class GameFilterBackend(FilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if "uuid" not in request.QUERY_PARAMS:
+            return []
 
-if settings.SEEDTIME_ENABLED:
-    router.register(r"games", GameViewSet, base_name="games")
-    router.register(r"game-candidate-us", GameUsViewSet, base_name="games")
+        try:
+            game = models.Game.objects.get(uuid=request.QUERY_PARAMS["uuid"])
+        except models.Game.DoesNotExist:
+            return []
+
+        if request.GET.get('discard') != 'true':
+            queryset = queryset.exclude(id__in=game.discard)
+
+        return queryset.filter(project=game.project).exclude(id__in=[us['id'] for us in
+                                                                     game.userstories])

@@ -15,6 +15,8 @@
 
 from taiga.base.api import serializers
 from taiga.base.fields import Field
+from taiga.projects.mixins.serializers import StatusExtraInfoSerializerMixin
+from taiga.projects.tagging.serializers import TaggedInProjectResourceSerializer
 
 
 class GameSerializer(serializers.LightSerializer):
@@ -29,3 +31,13 @@ class GameSerializer(serializers.LightSerializer):
     roles = Field()
     discard = Field()
     notnow = Field()
+
+
+class UserStorySerializer(StatusExtraInfoSerializerMixin, TaggedInProjectResourceSerializer,
+                          serializers.LightSerializer):
+    id = Field()
+    ref = Field()
+    subject = Field()
+    is_blocked = Field()
+    project = Field(attr="project_id")
+    version = Field()

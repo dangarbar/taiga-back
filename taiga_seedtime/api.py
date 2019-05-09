@@ -13,10 +13,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from taiga.base.api import ModelCrudViewSet
+from taiga.base import response
+from taiga.base import filters as base_filters
+from taiga.base.api import ModelCrudViewSet, GenericViewSet
 from taiga.base.api.utils import get_object_or_404
 from taiga.projects.occ import OCCResourceMixin
+from taiga.projects.userstories.models import UserStory
 
+from . import filters
 from . import models
 from . import permissions
 from . import serializers
@@ -41,3 +45,26 @@ class GameViewSet(OCCResourceMixin, ModelCrudViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         obj = get_object_or_404(queryset, **self.kwargs)
         return obj
+
+
+class GameUsViewSet(GenericViewSet):
+    serializer_class = serializers.UserStorySerializer
+    queryset = UserStory.objects.all()
+    permission_classes = (permissions.GamePermission,)
+    filter_backends = (
+        base_filters.CanViewUsFilterBackend,
+        filters.GameFilterBackend,
+    )
+    filter_fields = ["milestone__isnull",
+                     "status__is_archived",
+                     "status__is_closed"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_pagination_serializer(page)
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+
+        return response.Ok(serializer.data)
