@@ -24,8 +24,12 @@ MEDIA_ROOT = "/tmp"
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 INSTALLED_APPS = INSTALLED_APPS + [
-    "tests",
+    "tests"
 ]
+
+if "taiga_seedtime" not in INSTALLED_APPS:
+    INSTALLED_APPS.append("taiga_seedtime")
+
 
 REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
     "anon-write": None,
