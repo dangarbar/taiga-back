@@ -23,6 +23,8 @@ import premailer
 
 import logging
 
+import os
+import settings
 
 # Hide CSS warnings messages if debug mode is disable
 if not getattr(settings, "DEBUG", False):
@@ -32,9 +34,17 @@ if not getattr(settings, "DEBUG", False):
 class InlineCSSTemplateMail(template_mail.TemplateMail):
     def _render_message_body_as_html(self, context):
         html = super()._render_message_body_as_html(context)
+        html = premailer.transform(html)
+
+        if hasattr(settings, "EMAIL_FILE_PATH"):
+            fname = os.path.join(settings.EMAIL_FILE_PATH, "emails.html")
+            stream = open(fname, "a+")
+            stream.write(f"<hr><p><center>{self.name}</center></p><hr>")
+            stream.write(html)
+            stream.close()
 
         # Transform CSS into line style attributes
-        return premailer.transform(html)
+        return html
 
 
 class MagicMailBuilder(template_mail.MagicMailBuilder):
