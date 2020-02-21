@@ -428,7 +428,7 @@ class TaskSerializer(CustomAttributesValuesWebhookSerializerMixin, serializers.L
         return list(obj.get_watchers().values_list("id", flat=True))
 
     def get_promoted_to(self, obj):
-        return [us.id for us in obj.generated_user_stories.all()]
+        return list(obj.generated_user_stories.values_list("id", flat=True))
 
 
 ########################################################################
@@ -469,7 +469,7 @@ class IssueSerializer(CustomAttributesValuesWebhookSerializerMixin, serializers.
         return list(obj.get_watchers().values_list("id", flat=True))
 
     def get_promoted_to(self, obj):
-        return [us.id for us in obj.generated_user_stories.all()]
+        return list(obj.generated_user_stories.values_list("id", flat=True))
 
 
 ########################################################################
