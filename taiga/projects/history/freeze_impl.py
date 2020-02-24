@@ -379,7 +379,7 @@ def userstory_freezer(us) -> dict:
 
 
 def issue_freezer(issue) -> dict:
-    promoted_to = [us.id for us in issue.generated_user_stories.all()]
+    promoted_to = list(issue.generated_user_stories.values_list("id", flat=True))
 
     snapshot = {
         "ref": issue.ref,
@@ -407,7 +407,7 @@ def issue_freezer(issue) -> dict:
 
 
 def task_freezer(task) -> dict:
-    promoted_to = [us.id for us in task.generated_user_stories.all()]
+    promoted_to = list(task.generated_user_stories.values_list("id", flat=True))
 
     snapshot = {
         "ref": task.ref,
